@@ -190,6 +190,7 @@ while True:
 
         if not collision_sprite(): 			
             player_lives -= 1
+            clock.tick(6)
 
             if player_lives <= 0:
                 game_active = False
@@ -201,6 +202,8 @@ while True:
         score_message = test_font.render(f'Your score: {score}',False,(111,196,169))
         score_message_rect = score_message.get_rect(center = (400,330))
         screen.blit(game_name,game_name_rect)
+
+        player_lives = 5 #Should have added this earlier
 
         if score == 0:
             screen.blit(game_message,game_message_rect)
