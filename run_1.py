@@ -81,7 +81,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.org_y = y_pos
         self.offset = randint(-60, 60)
         self.max_offset = 60
-        self.speed = 0.02 #This is the percentage to move each time
+        self.speed = 1
 
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
@@ -95,13 +95,14 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = self.frames[int(self.animation_index)]
 
     def fly_around(self):
-        self.offset += (self.max_offset - self.offset) * self.speed
+        self.offset += self.speed
 
-        if abs(self.max_offset - self.offset) < 10:
-            self.max_offset *= -1
+        if self.offset > self.max_offset:
+            self.speed *= -1
+        elif self.offset < -self.max_offset:
+            self.speed *= -1
 
         self.rect.y = self.offset + self.org_y
-
 
     def update(self):
         self.animation_state()
@@ -189,7 +190,6 @@ while True:
 
         if not collision_sprite(): 			
             player_lives -= 1
-            clock.tick(6)
 
             if player_lives <= 0:
                 game_active = False
@@ -201,8 +201,6 @@ while True:
         score_message = test_font.render(f'Your score: {score}',False,(111,196,169))
         score_message_rect = score_message.get_rect(center = (400,330))
         screen.blit(game_name,game_name_rect)
-
-        player_lives = 5 #Should have added this earlier
 
         if score == 0:
             screen.blit(game_message,game_message_rect)
