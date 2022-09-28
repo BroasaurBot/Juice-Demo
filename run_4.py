@@ -179,6 +179,7 @@ player_stand = pygame.transform.rotozoom(player_stand,0,2)
 player_stand_rect = player_stand.get_rect(center = (400,200))
 
 player_lives = 5
+player_damaged = 0
 
 game_name = test_font.render('Pixel Runner',False,(111,196,169))
 game_name_rect = game_name.get_rect(center = (400,80))
@@ -212,10 +213,14 @@ while True:
         screen.blit(ground_surface,(0,300))
 
         player.draw(screen)
-        player.update()
 
         obstacle_group.draw(screen)
-        obstacle_group.update()
+
+        if player_damaged <= 0:
+            player.update()
+            obstacle_group.update()
+        else:
+            player_damaged -= 1
 
         particle_group.draw(screen)
         particle_group.update()
@@ -224,9 +229,10 @@ while True:
             player_lives -= 1
             particle_group.add(Particle("graphics/particles/damage.png",
                                         player.sprite.rect.center,
-                                        (100, 100),
+                                        (200, 200),
                                         20))
-            clock.tick(5)
+            
+            player_damaged = 30
 
             if player_lives <= 0:
                 game_active = False
