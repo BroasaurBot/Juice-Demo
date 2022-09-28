@@ -63,7 +63,7 @@ class Player(pygame.sprite.Sprite):
         self.apply_distort()
 
 class Obstacle(pygame.sprite.Sprite):
-    def __init__(self,type, particles):
+    def __init__(self,type):
         super().__init__()
 
         if type == 'fly':
@@ -82,7 +82,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.offset = randint(-60, 60)
         self.max_offset = 60
         self.speed = 0.02 #This is the percentage to move each time
-        self.particles = particles
 
         self.animation_index = 0
         self.image = self.frames[self.animation_index]
@@ -93,14 +92,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.animation_index += 0.1 
         if self.animation_index >= len(self.frames):
             self.animation_index = 0
-
-            particle_x = self.rect.center[0] + 10
-            particle_y =self.rect.center[1] + 30
-            self.particles.add(Particle("graphics/particles/puff.png",
-                                        (particle_x , particle_y),
-                                        (60, 60),
-                                        10))
-
         self.image = self.frames[int(self.animation_index)]
 
     def fly_around(self):
@@ -123,24 +114,6 @@ class Obstacle(pygame.sprite.Sprite):
 
     def destroy(self):
         if self.rect.x <= -100: 
-            self.kill()
-
-class Particle(pygame.sprite.Sprite):
-    def __init__(self, image, loc, size, lifetime):
-        super().__init__()
-        self.particle_image = pygame.image.load(image).convert_alpha() 
-        self.image = pygame.transform.scale(self.particle_image, size)
-        self.rect = self.image.get_rect(center = loc)
-        self.rect.size = size
-
-        self.total_life = lifetime
-        self.life = lifetime
-
-
-    def update(self):
-        self.life -= 1
-
-        if self.life <= 0:
             self.kill()
 
 def collision_sprite():
@@ -167,8 +140,6 @@ player = pygame.sprite.GroupSingle()
 player.add(Player())
 
 obstacle_group = pygame.sprite.Group()
-
-particle_group = pygame.sprite.Group() #For maintaing particles
 
 sky_surface = pygame.image.load('graphics/Sky.png').convert()
 ground_surface = pygame.image.load('graphics/ground.png').convert()
@@ -198,7 +169,7 @@ while True:
 
         if game_active:
             if event.type == obstacle_timer:
-                obstacle_group.add(Obstacle(choice(['fly','fly','snail','snail'], ), particle_group))
+                obstacle_group.add(Obstacle(choice(['fly','fly','snail','snail'])))
 
         else:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -207,7 +178,6 @@ while True:
 
 
     if game_active:
-
         screen.blit(sky_surface,(0,0))
         screen.blit(ground_surface,(0,300))
 
@@ -217,16 +187,9 @@ while True:
         obstacle_group.draw(screen)
         obstacle_group.update()
 
-        particle_group.draw(screen)
-        particle_group.update()
-
         if not collision_sprite(): 			
             player_lives -= 1
-            particle_group.add(Particle("graphics/particles/damage.png",
-                                        player.sprite.rect.center,
-                                        (100, 100),
-                                        20))
-            clock.tick(5)
+            clock.tick(6)
 
             if player_lives <= 0:
                 game_active = False
